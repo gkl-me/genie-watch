@@ -1,9 +1,9 @@
-
-//fisher yates shuffle
-function shuffleMovies<T>(movies: T[]) {
-    for (let i = movies.length - 1; i > 0; i--) {
+// fisher-yates shuffle
+export function shuffleMovies<T>(movies: T[]) {
+    const shuffled = [...movies];
+    for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [movies[i], movies[j]] = [movies[j], movies[i]];
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return movies;
+    return shuffled;
 }

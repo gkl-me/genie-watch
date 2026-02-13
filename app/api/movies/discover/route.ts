@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { discoverMovies } from '@/lib/tmdb';
+import { discoverMoviesWithFullLogic } from '@/lib/movieService';
 
 export async function POST(req: NextRequest) {
   try {
-    const { genres, minRating, count } = await req.json();
+    const { genres, minRating, count, gteYear, lteYear, excludeIds } = await req.json();
 
     if (!genres || !Array.isArray(genres)) {
       return NextResponse.json({ error: 'Missing or invalid genres' }, { status: 400 });
     }
 
-    const movies = await discoverMovies({
+    const movies = await discoverMoviesWithFullLogic({
       genres,
       minRating: minRating || 0,
       count: count || 1,
+      gteYear,
+      lteYear,
+      excludeIds: excludeIds || [],
     });
 
     return NextResponse.json(movies);

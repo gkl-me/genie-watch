@@ -19,22 +19,41 @@ export const fetchGenres = async () => {
 export const discoverMovies = async ({ 
   genres, 
   minRating, 
-  count = 1 
+  count = 1,
+  gteYear,
+  lteYear,
+  page = 1
 }: { 
   genres: number[], 
   minRating: number, 
-  count?: number 
+  count?: number,
+  gteYear?: number | null,
+  lteYear?: number | null,
+  page?: number
 }) => {
-  const response = await tmdb.get('/discover/movie', {
-    params: {
-      with_genres: genres.join(','),
-      'vote_average.gte': minRating,
-      'vote_count.gte': 100, // Ensure movies have some votes for quality
-      sort_by: 'popularity.desc',
-      page: 1,
-    },
-  });
+  const params: any = {
+    with_genres: genres.join(','),
+    'vote_average.gte': minRating,
+    'vote_count.gte': 100, // Ensure movies have some votes for quality
+    sort_by: 'popularity.desc',
+    page,
+  };
 
-  // TMDB returns 20 per page, we slice to the requested count
-  return response.data.results.slice(0, count);
+  if (gteYear) {
+    params['primary_release_date.gte'] = `${gteYear}-01-01`;
+  }
+  if (lteYear) {
+    params['primary_release_date.lte'] = `${lteYear}-12-31`;
+  }
+
+  const response = await tmdb.get('/discover/movie', { params });
+  return {
+    results: response.data.results,
+    total_pages: response.data.total_pages
+  };
+};
+
+export const getImdbId = async (tmdbId: number) => {
+    const response = await tmdb.get(`/movie/${tmdbId}/external_ids`);
+    return response.data.imdb_id;
 };

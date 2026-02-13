@@ -5,14 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { GenreSelector } from '@/components/home/GenreSelector';
 import { MovieCountSelector } from '@/components/home/MovieCountSelector';
 import { RatingSelector } from '@/components/home/RatingSelector';
+import { YearSelector } from '@/components/home/YearSelector';
 import { FindButton } from '@/components/home/FindButton';
 import { MovieCard } from '@/components/movies/MovieCard';
 import { Loader2 } from 'lucide-react';
+import { getShownMovies, saveShownMovies } from '@/lib/cacheHelper';
 
 // Memoize sub-components to prevent re-renders unless their props change
 const MemoizedGenreSelector = memo(GenreSelector);
 const MemoizedMovieCountSelector = memo(MovieCountSelector);
 const MemoizedRatingSelector = memo(RatingSelector);
+const MemoizedYearSelector = memo(YearSelector);
 
 interface Movie {
   id: number;
@@ -22,6 +25,7 @@ interface Movie {
   backdrop_path: string;
   vote_average: number;
   release_date: string;
+  imdbRating: number;
 }
 
 interface Genre {
@@ -37,6 +41,8 @@ export function HomeClient({ initialGenres }: HomeClientProps) {
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [movieCount, setMovieCount] = useState<number>(1);
   const [minRating, setMinRating] = useState<number>(6.5);
+  const [gteYear, setGteYear] = useState<number | null>(null);
+  const [lteYear, setLteYear] = useState<number | null>(null);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -54,21 +60,37 @@ export function HomeClient({ initialGenres }: HomeClientProps) {
     setMinRating(min);
   }, []);
 
+  const handleYearChange = useCallback((gte: number | null, lte: number | null) => {
+    setGteYear(gte);
+    setLteYear(lte);
+  }, []);
+
   const handleFindMovies = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/movies/discover', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          genres: selectedGenres,
-          minRating,
-          count: movieCount,
-        }),
-      });
+        const shownMovies = getShownMovies();
+        const excludeIds = shownMovies.map(m => m.tmdbId);
+
+        const response = await fetch('/api/movies/discover', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            genres: selectedGenres,
+            minRating,
+            count: movieCount,
+            gteYear,
+            lteYear,
+            excludeIds,
+          }),
+        });
 
       if (!response.ok) throw new Error('Failed to find movies');
       const data = await response.json();
+      
+      // Save results to cache
+      data.forEach((movie: any) => saveShownMovies(movie.id));
+      console.log(data)
+      
       setMovies(data);
     } catch (error) {
       console.error(error);
@@ -76,7 +98,7 @@ export function HomeClient({ initialGenres }: HomeClientProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedGenres, movieCount, minRating]);
+  }, [selectedGenres, movieCount, minRating, gteYear, lteYear]);
 
   return (
     <div className="relative z-10 px-6 py-12 max-w-7xl mx-auto space-y-16">
@@ -125,8 +147,19 @@ export function HomeClient({ initialGenres }: HomeClientProps) {
                     onChange={handleRatingChange} 
                 />
 
+                <div className="h-px bg-white/10" />
+
+                <MemoizedYearSelector 
+                    gteYear={gteYear} 
+                    lteYear={lteYear} 
+                    onChange={handleYearChange} 
+                />
+
                 <div className="pt-8 text-center">
-                    <FindButton onClick={handleFindMovies} disabled={isLoading} />
+                    <FindButton 
+                      onClick={handleFindMovies} 
+                      disabled={isLoading || (!!gteYear && !!lteYear && gteYear > lteYear)} 
+                    />
                     {isLoading && (
                       <div className="mt-4 flex items-center justify-center gap-2 text-indigo-400 animate-pulse">
                         <Loader2 className="w-5 h-5 animate-spin" />

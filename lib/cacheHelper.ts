@@ -1,30 +1,22 @@
+const SHOWN_KEY = "shown_movies";
 
-
-const SHOWN_KEY = "shown_movies"
-
-
-
-function saveShownMovies(tmdbId:string) {
-
-    const shownMovies = JSON.parse(localStorage.getItem(SHOWN_KEY) || "[]")
-
-    shownMovies.push({tmdbId,time:Date.now()})
-
-    localStorage.setItem(SHOWN_KEY, JSON.stringify(shownMovies))
-
+export function saveShownMovies(tmdbId: number) {
+    if (typeof window === 'undefined') return;
+    const shownMovies = getShownMovies();
+    shownMovies.push({ tmdbId, time: Date.now() });
+    localStorage.setItem(SHOWN_KEY, JSON.stringify(shownMovies));
 }
 
+export function getShownMovies() {
+    if (typeof window === 'undefined') return [];
+    let shownMovies: { tmdbId: number, time: number }[] = JSON.parse(localStorage.getItem(SHOWN_KEY) || "[]");
 
-function getShownMovies() {
-
-    let shownMovies: {tmdbId:string,time:number}[] = JSON.parse(localStorage.getItem(SHOWN_KEY) || "[]")
-
-    //1 hour in ms
-    const time = 60 * 60 * 1000;
+    // 30 minutes in ms
+    const thirtyMinutes = 30 * 60 * 1000;
     
-    shownMovies = shownMovies.filter((m) => Date.now() - m.time < time)
+    shownMovies = shownMovies.filter((m) => Date.now() - m.time < thirtyMinutes);
 
-    localStorage.setItem(SHOWN_KEY, JSON.stringify(shownMovies))
+    localStorage.setItem(SHOWN_KEY, JSON.stringify(shownMovies));
 
-    return shownMovies
+    return shownMovies;
 }
