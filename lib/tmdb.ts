@@ -33,7 +33,7 @@ export const discoverMovies = async ({
 }) => {
   const params: any = {
     with_genres: genres.join(','),
-    'vote_average.gte': minRating,
+    'vote_average.gte': minRating-1.5,
     'vote_count.gte': 100, // Ensure movies have some votes for quality
     sort_by: 'popularity.desc',
     page,

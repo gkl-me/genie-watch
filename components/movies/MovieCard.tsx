@@ -40,6 +40,8 @@ export function MovieCard({ movie }: MovieCardProps) {
       exit={{ opacity: 0, scale: 0.9 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
+      onFocus={() => setIsHovered(true)}
+      onClick={() => setIsHovered(prev => !prev)}
       className="group relative bg-[#1a1a1a] rounded-2xl overflow-hidden shadow-2xl border border-white/5 h-[450px] w-full max-w-[300px] cursor-pointer"
     >
       {/* Poster Image */}
@@ -60,6 +62,7 @@ export function MovieCard({ movie }: MovieCardProps) {
           <motion.h3 
             className="text-xl font-bold text-white line-clamp-2 leading-tight"
             animate={{ y: isHovered ? -10 : 0 }}
+            transition={{duration:0.2,ease:"easeOut"}}
           >
             {movie.title}
           </motion.h3>

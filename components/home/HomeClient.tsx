@@ -10,6 +10,7 @@ import { FindButton } from '@/components/home/FindButton';
 import { MovieCard } from '@/components/movies/MovieCard';
 import { Loader2 } from 'lucide-react';
 import { getShownMovies, saveShownMovies } from '@/lib/cacheHelper';
+import { toast } from 'sonner';
 
 // Memoize sub-components to prevent re-renders unless their props change
 const MemoizedGenreSelector = memo(GenreSelector);
@@ -39,7 +40,7 @@ interface HomeClientProps {
 
 export function HomeClient({ initialGenres }: HomeClientProps) {
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
-  const [movieCount, setMovieCount] = useState<number>(1);
+  const [movieCount, setMovieCount] = useState<number>(5);
   const [minRating, setMinRating] = useState<number>(6.5);
   const [gteYear, setGteYear] = useState<number | null>(null);
   const [lteYear, setLteYear] = useState<number | null>(null);
@@ -92,9 +93,12 @@ export function HomeClient({ initialGenres }: HomeClientProps) {
       console.log(data)
       
       setMovies(data);
+      if(data.length == 0){
+        toast.error('No movies found. Please try again!');
+      }
     } catch (error) {
       console.error(error);
-      alert('Genie failed to find movies. Please try again!');
+      toast.error('Genie failed to find movies. Please try again!');
     } finally {
       setIsLoading(false);
     }
