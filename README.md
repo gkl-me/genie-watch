@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧞‍♂️ Genie Watch
 
-## Getting Started
+Genie Watch is a premium movie discovery platform that helps users find their next favorite cinematic experience. With advanced filtering by genres, ratings, and release years, the "Genie" grants your cinematic wishes with high-quality, randomized suggestions.
 
-First, run the development server:
+![Preview](./public/preview.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Advanced Search**: Filter by multiple genres, minimum rating, and specific year ranges (Start/End).
+- **Smart Discovery**: Uses random page harvesting and Fisher-Yates shuffling to ensure you always see fresh content.
+- **Deduplication**: Remembers what you've seen and avoids showing the same movies within a 30-minute window (stored in LocalStorage).
+- **IMDb Integration**: Sourced ratings directly from IMDb (via OMDB API) or falls back to TMDB ratings for accuracy.
+- **Performance Optimized**: Features a Prisma-based caching layer to store movie metadata and ratings locally, reducing external API latency.
+- **Premium UI/UX**: Built with Next.js, Framer Motion for smooth animations, and a sleek glassmorphic dark mode design.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Getting Started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Prerequisites
 
-## Learn More
+- Node.js (v18+)
+- PostgreSQL Database
+- TMDB API Token ([Get one here](https://www.themoviedb.org/documentation/api))
+- OMDB API Key ([Get one here](http://www.omdbapi.com/apikey.aspx))
 
-To learn more about Next.js, take a look at the following resources:
+### Setup Instructions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  **Clone the Repository**:
+    ```bash
+    git clone <repository-url>
+    cd genie-watch
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
 
-## Deploy on Vercel
+3.  **Environment Variables**:
+    Copy the example environment file and fill in your credentials:
+    ```bash
+    cp .env.example .env
+    ```
+    *Make sure to provide your `DATABASE_URL`, `TMDB_ACCESS_TOKEN`, and `OMDB_API_KEY`.*
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4.  **Database Initialisation**:
+    Push the Prisma schema to your database:
+    ```bash
+    npx prisma db push
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5.  **Run Development Server**:
+    ```bash
+    npm run dev
+    ```
+
+6.  **Open the App**:
+    Navigate to [http://localhost:3000](http://localhost:3000).
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Database**: PostgreSQL (Prisma ORM)
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **API**: Axios
+
+---
+
+*Made with 🪄 by Gokul*
