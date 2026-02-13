@@ -3,7 +3,7 @@ import { discoverMoviesWithFullLogic } from '@/lib/movieService';
 
 export async function POST(req: NextRequest) {
   try {
-    const { genres, minRating, count, gteYear, lteYear, excludeIds } = await req.json();
+    const { genres, minRating, count, gteYear, lteYear, excludeIds, language } = await req.json();
 
     if (!genres || !Array.isArray(genres)) {
       return NextResponse.json({ error: 'Missing or invalid genres' }, { status: 400 });
@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
       gteYear,
       lteYear,
       excludeIds: excludeIds || [],
+      language
     });
 
     return NextResponse.json(movies);

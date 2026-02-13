@@ -11,6 +11,7 @@ interface DiscoverParams {
   gteYear?: number | null;
   lteYear?: number | null;
   excludeIds?: number[];
+  language?: string;
 }
 
 export async function discoverMoviesWithFullLogic({
@@ -19,7 +20,8 @@ export async function discoverMoviesWithFullLogic({
   count,
   gteYear,
   lteYear,
-  excludeIds = []
+  excludeIds = [],
+  language
 }: DiscoverParams) {
   let attempts = 0;
   const maxAttempts = 5; // Reasonable limit to avoid excessive API calls
@@ -27,7 +29,7 @@ export async function discoverMoviesWithFullLogic({
   const processedTmdbIds = new Set<number>();
 
   // 1. Initial request to get total pages
-  const initial = await discoverMovies({ genres, minRating, count, gteYear, lteYear, page: 1 });
+  const initial = await discoverMovies({ genres, minRating, count, gteYear, lteYear, page: 1, language });
   const totalPages = initial.total_pages;
 
   while (attempts < maxAttempts && validMovies.length < count) {
@@ -38,7 +40,8 @@ export async function discoverMoviesWithFullLogic({
         count, 
         gteYear, 
         lteYear, 
-        page: randomPage 
+        page: randomPage,
+        language
     });
 
     // 2. Filter and Enhance this batch

@@ -1,4 +1,4 @@
-import { fetchGenres } from '@/lib/tmdb';
+import { fetchGenres, fetchLanguages } from '@/lib/tmdb';
 import { Logo } from '@/components/ui/Logo';
 import { HomeClient } from '@/components/home/HomeClient';
 import { getErrorMessage } from '@/lib/axios-error';
@@ -8,8 +8,12 @@ export const dynamic = 'force-dynamic'; // Ensure fresh data if needed, or stick
 export default async function Home() {
 
   let genres = [];
+  let languages = [];
   try {
-    genres = await fetchGenres();
+    [genres, languages] = await Promise.all([
+      fetchGenres(),
+      fetchLanguages()
+    ]);
   } catch (error) {
     console.log(error)
     throw new Error(getErrorMessage(error))
@@ -30,7 +34,7 @@ export default async function Home() {
       </header>
 
       <main>
-        <HomeClient initialGenres={genres} />
+        <HomeClient initialGenres={genres} initialLanguages={languages} />
       </main>
       
       <footer className="relative z-10 py-6 text-center text-sm text-muted-foreground">

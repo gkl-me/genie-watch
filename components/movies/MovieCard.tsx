@@ -69,7 +69,7 @@ export function MovieCard({ movie }: MovieCardProps) {
           <div className="flex items-center gap-3 text-sm text-gray-300">
             <div className="flex items-center gap-1">
               <Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" />
-              <span className="font-bold text-white">{ movie.imdbRating || movie.vote_average.toFixed(1) }</span>
+              <span className="font-bold text-white">{ movie.imdbRating.toFixed(1) || movie.vote_average.toFixed(1) }</span>
             </div>
             <div className="flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" />

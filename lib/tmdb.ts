@@ -22,14 +22,16 @@ export const discoverMovies = async ({
   count = 1,
   gteYear,
   lteYear,
-  page = 1
+  page = 1,
+  language
 }: { 
   genres: number[], 
   minRating: number, 
   count?: number,
   gteYear?: number | null,
   lteYear?: number | null,
-  page?: number
+  page?: number,
+  language?: string
 }) => {
   const params: any = {
     with_genres: genres.join(','),
@@ -45,12 +47,21 @@ export const discoverMovies = async ({
   if (lteYear) {
     params['primary_release_date.lte'] = `${lteYear}-12-31`;
   }
+  if (language) {
+    params['with_original_language'] = language;
+  }
+  
 
   const response = await tmdb.get('/discover/movie', { params });
   return {
     results: response.data.results,
     total_pages: response.data.total_pages
   };
+};
+
+export const fetchLanguages = async () => {
+    const response = await tmdb.get('/configuration/languages');
+    return response.data;
 };
 
 export const getImdbId = async (tmdbId: number) => {

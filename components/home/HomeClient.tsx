@@ -6,6 +6,7 @@ import { GenreSelector } from '@/components/home/GenreSelector';
 import { MovieCountSelector } from '@/components/home/MovieCountSelector';
 import { RatingSelector } from '@/components/home/RatingSelector';
 import { YearSelector } from '@/components/home/YearSelector';
+import { LanguageSelector } from '@/components/home/LanguageSelector';
 import { FindButton } from '@/components/home/FindButton';
 import { MovieCard } from '@/components/movies/MovieCard';
 import { Loader2 } from 'lucide-react';
@@ -17,6 +18,7 @@ const MemoizedGenreSelector = memo(GenreSelector);
 const MemoizedMovieCountSelector = memo(MovieCountSelector);
 const MemoizedRatingSelector = memo(RatingSelector);
 const MemoizedYearSelector = memo(YearSelector);
+const MemoizedLanguageSelector = memo(LanguageSelector);
 
 interface Movie {
   id: number;
@@ -34,16 +36,24 @@ interface Genre {
   name: string;
 }
 
-interface HomeClientProps {
-  initialGenres: Genre[];
+interface Language {
+  iso_639_1: string;
+  english_name: string;
+  name: string;
 }
 
-export function HomeClient({ initialGenres }: HomeClientProps) {
+interface HomeClientProps {
+  initialGenres: Genre[];
+  initialLanguages: Language[];
+}
+
+export function HomeClient({ initialGenres, initialLanguages }: HomeClientProps) {
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [movieCount, setMovieCount] = useState<number>(5);
   const [minRating, setMinRating] = useState<number>(6.5);
   const [gteYear, setGteYear] = useState<number | null>(null);
   const [lteYear, setLteYear] = useState<number | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('');
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -66,6 +76,10 @@ export function HomeClient({ initialGenres }: HomeClientProps) {
     setLteYear(lte);
   }, []);
 
+  const handleLanguageChange = useCallback((iso: string) => {
+    setSelectedLanguage(iso);
+  }, []);
+
   const handleFindMovies = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -82,6 +96,7 @@ export function HomeClient({ initialGenres }: HomeClientProps) {
             gteYear,
             lteYear,
             excludeIds,
+            language: selectedLanguage,
           }),
         });
 
@@ -102,7 +117,7 @@ export function HomeClient({ initialGenres }: HomeClientProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedGenres, movieCount, minRating, gteYear, lteYear]);
+  }, [selectedGenres, movieCount, minRating, gteYear, lteYear,selectedLanguage]);
 
   return (
     <div className="relative z-10 px-6 py-12 max-w-7xl mx-auto space-y-16">
@@ -153,11 +168,19 @@ export function HomeClient({ initialGenres }: HomeClientProps) {
 
                 <div className="h-px bg-white/10" />
 
+                <MemoizedLanguageSelector 
+                    languages={initialLanguages}
+                    selectedLanguage={selectedLanguage}
+                    onLanguageChange={handleLanguageChange}
+                />
+                <div className="h-px bg-white/10" />
+
                 <MemoizedYearSelector 
                     gteYear={gteYear} 
                     lteYear={lteYear} 
                     onChange={handleYearChange} 
                 />
+
 
                 <div className="pt-8 text-center">
                     <FindButton 
